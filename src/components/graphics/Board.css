@@ -1,0 +1,21 @@
+#Board {
+    display: grid;
+    grid-template-columns: repeat(8, 100px);
+    grid-template-rows: repeat(8, 100px);
+    width: 800px;
+    height: 800px;
+    background-color: blue;
+}
+
+#Board .tile {
+    width: 100px;
+    height: 100px;
+}
+
+#Board .white-tile {
+    background-color:antiquewhite;
+}
+
+#Board .black-tile  {
+    background-color: black;
+}
