@@ -15,14 +15,15 @@ import black_rook from "../../assets/black_rook.svg";
 import black_queen from "../../assets/black_queen.svg";
 import black_king from "../../assets/black_king.svg";
 
+import Piece from './Piece';
+
 let VERTICAL_AXIS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 let HORIZONTAL_AXIS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 export default function Board(props) {
     let board = [];
-    console.log(props.board)
     for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
         for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
-            let number  = j + i + 2;
+            let number = j + i + 1;
             let src = "";
             let piece_exist = true;
             let current_pos = props.board[j][i];
@@ -54,14 +55,14 @@ export default function Board(props) {
                 src = black_king;
             }
 
-            if (piece_exist) {
+            if (piece_exist) { 
                 if (number % 2 === 0) {
                     board.push(
-                        <div className="tile white-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> <img className="tile" src={src}></img> </div>
+                        <div className="tile white-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> <Piece src={src} ></Piece> </div>
                     );
                 } else {
                     board.push(
-                        <div className="tile black-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> <img className="tile" src={src}></img> </div>
+                        <div className="tile black-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> <Piece src={src} ></Piece> </div>
                     );
                 }
             } else {
@@ -77,6 +78,13 @@ export default function Board(props) {
             }
         
         }
+      }
+      if (props.invert) {
+          let newBoard = [];
+          for (let i = 0; i < board.length; i++) {
+              newBoard.push(board[board.length - 1 - i]);
+          }
+          board = newBoard;
       }
     return (
     <div id="Board">
