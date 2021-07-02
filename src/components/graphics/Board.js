@@ -19,7 +19,15 @@ import Piece from './Piece';
 
 let VERTICAL_AXIS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 let HORIZONTAL_AXIS = ["A", "B", "C", "D", "E", "F", "G", "H"];
+let currentPiece = [-1, -1];
 export default function Board(props) {
+
+    function clickPiece(x, y) {
+        currentPiece = [x, y]
+        console.log(currentPiece);
+    }
+
+
     let board = [];
     for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
         for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
@@ -58,11 +66,17 @@ export default function Board(props) {
             if (piece_exist) { 
                 if (number % 2 === 0) {
                     board.push(
-                        <div className="tile white-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> <Piece src={src} ></Piece> </div>
+                        <div className="tile white-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> 
+                            <Piece src={src} clickPiece={clickPiece} pos={[j, i]}>
+                            </Piece> 
+                        </div>
                     );
                 } else {
                     board.push(
-                        <div className="tile black-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> <Piece src={src} ></Piece> </div>
+                        <div className="tile black-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> 
+                            <Piece src={src} clickPiece={clickPiece} pos={[j, i]}>
+                            </Piece>
+                         </div>
                     );
                 }
             } else {
