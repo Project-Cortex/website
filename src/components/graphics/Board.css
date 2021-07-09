@@ -21,3 +21,7 @@
 #Board .black-tile  {
     background-color: green;
 }
+
+#Board .highlighted-tile {
+    background-color: blue;
+}
