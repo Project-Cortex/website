@@ -21,24 +21,57 @@ let VERTICAL_AXIS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 let HORIZONTAL_AXIS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 let currentPiece = [-1, -1];
 let hasPiece = false;
+let highlightedSquares = [];
 export default function Board(props) {
     const [flip, doFlip] = useState(true);
     function clickPiece(x, y) {
         if (hasPiece) {
             console.log("something");
             props.movePiece([currentPiece[0],currentPiece[1]], [x,y]);
+            highlightedSquares = [];
             doFlip(!flip);
             hasPiece = false;
         } else if (props.board[x][y] != 0) {
+            doFlip(!flip);
             hasPiece = true;
         } else {
+            doFlip(!flip);
             hasPiece = false;
         }
         currentPiece = [x, y]
     }
 
+    function findPotentialMoves (x, y) {
+        highlightedSquares = [];
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                if (i != 0 || j != 0) {
+                    if (inBounds(x + i, y + j)) {
+                        highlightedSquares.push([x + i, y + j]);
+                    }
+                } 
+            }
+        }
+    }
+
+    function inBounds(x, y) {
+        if (x < 0 || x > 7 || y < 0 || y > 7) {
+            return false;
+        } 
+        return true;
+    }
 
     let board = [];
+    if (hasPiece) {
+        findPotentialMoves(currentPiece[0], currentPiece[1]);
+        let length = highlightedSquares.length;
+        for (let i = 0; i < highlightedSquares.length; i++) {
+            if (props.board[highlightedSquares[i][0]][highlightedSquares[i][1]] != 0) {
+                highlightedSquares.splice(i, 1);
+                i--;
+            }
+        }
+    } 
     for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
         for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
             let number = j + i + 1;
@@ -72,43 +105,36 @@ export default function Board(props) {
             } else if (current_pos === -15) {
                 src = black_king;
             }
+            let color = "tile black-tile";
+            if (number % 2 === 0) {
+                color = "tile white-tile";
+            }
 
-            if (piece_exist) { 
-                if (number % 2 === 0) {
-                    board.push(
-                        <div className="tile white-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> 
-                            <Piece src={src} clickPiece={clickPiece} pos={[j, i]}>
-                            </Piece> 
-                        </div>
-                    );
-                } else {
-                    board.push(
-                        <div className="tile black-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> 
-                            <Piece src={src} clickPiece={clickPiece} pos={[j, i]}>
-                            </Piece>
-                         </div>
-                    );
-                }
-            } else {
-                if (number % 2 === 0) {
-                    board.push(
-                        <div className="tile white-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}>
-                            <Piece src={""} clickPiece={clickPiece} pos={[j, i]}>
-                            </Piece>
-                        </div>
-                    );
-                } else {
-                    board.push(
-                        <div className="tile black-tile" key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> 
-                            <Piece src={""} clickPiece={clickPiece} pos={[j, i]}>
-                            </Piece>
-                        </div>
-                    );
+            for (let o = 0; o < highlightedSquares.length; o++) {
+                if (j === highlightedSquares[o][0] && i === highlightedSquares[o][1]) {
+                    color = "tile highlighted-tile";
                 }
             }
-        
+
+            if (piece_exist) { 
+                board.push(
+                    <div className={color} key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}> 
+                        <Piece src={src} clickPiece={clickPiece} pos={[j, i]}>
+                        </Piece>
+                        </div>
+                );
+            } else {
+                board.push(
+                    <div className={color} key={VERTICAL_AXIS[i] + HORIZONTAL_AXIS[j]}>
+                        <Piece src={""} clickPiece={clickPiece} pos={[j, i]}>
+                        </Piece>
+                    </div>
+                );
+            }
         }
       }
+
+
       if (props.invert) {
           let newBoard = [];
           for (let i = 0; i < board.length; i++) {
