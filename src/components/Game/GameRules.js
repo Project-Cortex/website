@@ -20,7 +20,7 @@ function getPiecefromPIdent(pIdent){
 export default function getValidMoveTiles(board, pos){
     //all the good stuff here later
     
-    pos = [pos[0] - 1, pos[1] - 1];
+    pos = [pos[0], pos[1]];
     if(board[pos[0]][pos[1]] === 0) {
         console.warn("ATTEMPTED TO GET VALID MOVE OF EMPTY SQUARE");
         return -1;
@@ -38,17 +38,18 @@ export default function getValidMoveTiles(board, pos){
     let absP = Math.abs(pIdent);
     //case for knight
     if(absP === 3){
-        console.log(getValidKnightMoves(board, moveBoard, pos, pIdent));
+        return(getValidKnightMoves(board, moveBoard, pos, pIdent));
     }
     //case for pawn
     if(absP === 1){
-        console.log(getValidPawnMoves(board, moveBoard, pos, pIdent));
+        let result = getValidPawnMoves(board, moveBoard, pos, pIdent);
+        return(result);
     }
 
     //case for sliding
     
     if(absP === 4 || absP === 5 || absP === 9 || absP === 15){
-        console.log(getValidSlidingMoves(board, moveBoard, pos, pIdent));
+        return(getValidSlidingMoves(board, moveBoard, pos, pIdent));
     }
 }
 
@@ -69,7 +70,6 @@ function getValidPawnMoves(board, moveBoard, pos, pIdent){
 
     let canMove = true;
     moves.forEach(move => {
-        
         if(move[0] > -1 && move[0] < 8 && move[1] > -1 && move[0] < 8){
             let Bedit = board[move[0]][move[1]];
 

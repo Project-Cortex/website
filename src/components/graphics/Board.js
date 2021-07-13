@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Game from "../Game/Game.js";
 
 import "./Board.css";
 
@@ -24,6 +25,7 @@ let hasPiece = false;
 let highlightedSquares = [];
 export default function Board(props) {
     const [flip, doFlip] = useState(true);
+    let game = new Game(props.board);
     function clickPiece(x, y) {
         if (hasPiece) {
             console.log("something");
@@ -42,14 +44,14 @@ export default function Board(props) {
     }
 
     function findPotentialMoves (x, y) {
+        let possibleMoves = game.getMove(x,y);
+        console.log(possibleMoves);
         highlightedSquares = [];
-        for (let i = -1; i <= 1; i++) {
-            for (let j = -1; j <= 1; j++) {
-                if (i != 0 || j != 0) {
-                    if (inBounds(x + i, y + j)) {
-                        highlightedSquares.push([x + i, y + j]);
-                    }
-                } 
+        for (let i = 0; i < possibleMoves.length; i++) {
+            for (let j = 0; j < possibleMoves[i].length; j++) {
+                if (possibleMoves[i][j] != 0) {
+                    highlightedSquares.push([i, j])
+                }
             }
         }
     }
@@ -72,6 +74,8 @@ export default function Board(props) {
             }
         }
     } 
+
+
     for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
         for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
             let number = j + i + 1;

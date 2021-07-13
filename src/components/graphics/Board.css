@@ -25,3 +25,7 @@
 #Board .highlighted-tile {
     background-color: blue;
 }
+
+#Board .captured-tile {
+    background-color: red;
+}
