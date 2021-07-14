@@ -45,7 +45,7 @@ export default function Board(props) {
 
     function findPotentialMoves (x, y) {
         let possibleMoves = game.getMove(x,y);
-        console.log(possibleMoves);
+        //console.log(possibleMoves);
         highlightedSquares = [];
         for (let i = 0; i < possibleMoves.length; i++) {
             for (let j = 0; j < possibleMoves[i].length; j++) {

@@ -16,8 +16,122 @@ function getPiecefromPIdent(pIdent){
     else if (pIdent === 15) return king;
     else if (pIdent === 9) return queen;
 }
-//pIdent = piece identity, board = current board = [8][8], pos = [x, y]
+
+//side = - if black, + if white
+function checkCheck(board, moveBoard, pIdent){
+    
+    let valid = true;
+
+    let tempBoard = copyBoard(board);
+
+    let movePositions = getAllPos(moveBoard, 1);
+
+    console.log(moveBoard);
+
+    let current_pos = getAllPos(moveBoard, 3)[0];
+
+    movePositions.forEach(pos => {
+        tempBoard[pos[0]][pos[1]] = 3;
+        tempBoard[current_pos[0]][current_pos[1]] = 0;
+
+        if(isInCheck(tempBoard, pIdent)){
+            moveBoard[pos[0]][pos[1]] = 0;
+        }
+
+        tempBoard = copyBoard(board);
+    });
+
+    return moveBoard;
+}
+
+
+
+//side = -1 if black, 1 if white
+function isInCheck(board, side){
+
+    let inCheck = false;
+
+    for(let x = 0; x < 8; x++){
+        for(let y = 0; y < 8; y++){
+            let pos = [y, x];
+
+            let piece = board[pos[0]][pos[1]];
+            
+            if(piece === 0) continue;
+
+            if(!sameSign(side, piece)){
+
+                let moveBoard = getMoveTiles(board, pos);
+                
+                for(let x1 = 0; x1 < 8; x1++){
+                    for(let y1 = 0; y1 < 8; y1++){
+
+                        let pos1 = [y1, x1];
+
+                        if(getPIdentAtPosition(moveBoard, pos1) !== 2) continue;
+
+                        if(Math.abs(getPIdentAtPosition(board, pos1) === 15)){
+                            inCheck = true;
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    return inCheck;
+}
+
+//returns an array of all positions containing targetNum
+function getAllPos(board, targetNum){
+
+    let positions = [];
+
+    for(let x = 0; x < 8; x++){
+        for(let y = 0; y < 8; y++){
+            if(board[y][x] == targetNum){
+                positions.push([y, x]);
+            }
+        }
+    }
+
+    return positions;
+}
+
+function copyBoard(board){
+    let tempBoard = [];
+
+    for(let i = 0; i < 8; i++){
+        tempBoard.push([0, 0, 0, 0, 0, 0, 0, 0]);
+    }
+
+    for(let x = 0; x < 8; x++){
+        for(let y = 0; y < 8; y++){
+            tempBoard[y][x] = board[y][x];
+        }
+    }
+
+    return tempBoard;
+}
+
+function getPIdentAtPosition(board, pos){
+    return board[pos[0]][pos[1]];
+}
+
+
+//pIdent = piece identity, board = current board = [8][8], pos = [y, x]
 export default function getValidMoveTiles(board, pos){
+    
+    let moveBoard = getMoveTiles(board, pos);
+
+    moveBoard = checkCheck(board, moveBoard, board[pos[0]][pos[1]]);
+
+    return moveBoard;
+}
+
+//gets all basic movement from a piece at a position. Does not account for any special gamerules.
+function getMoveTiles(board, pos){
     //all the good stuff here later
     
     pos = [pos[0], pos[1]];
@@ -33,31 +147,33 @@ export default function getValidMoveTiles(board, pos){
         moveBoard.push([0, 0, 0, 0, 0, 0, 0, 0]);
     }
     
-    moveBoard[pos[0]][pos[1]] = 0;
+    moveBoard[pos[0]][pos[1]] = 3;
 
     let absP = Math.abs(pIdent);
     //case for knight
     if(absP === 3){
-        return(getValidKnightMoves(board, moveBoard, pos, pIdent));
+        moveBoard = getValidKnightMoves(board, moveBoard, pos, pIdent);
     }
     //case for pawn
     if(absP === 1){
-        let result = getValidPawnMoves(board, moveBoard, pos, pIdent);
-        return(result);
+        moveBoard = getValidPawnMoves(board, moveBoard, pos, pIdent);
+        
     }
 
     //case for sliding
     
     if(absP === 4 || absP === 5 || absP === 9 || absP === 15){
-        return(getValidSlidingMoves(board, moveBoard, pos, pIdent));
+        moveBoard = getValidSlidingMoves(board, moveBoard, pos, pIdent);
     }
+
+    return moveBoard;
 }
 
 
 
 function getValidPawnMoves(board, moveBoard, pos, pIdent){
     //1. movement
-    //since the abs(pIdent) == 1, pIdent will represent direction of potential travel
+    //since the abs(pIdent) === 1, pIdent will represent direction of potential travel
     let travelDirection = pIdent;
 
     let moves = [];
