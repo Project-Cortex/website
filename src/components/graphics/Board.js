@@ -28,11 +28,20 @@ export default function Board(props) {
     let game = new Game(props.board);
     function clickPiece(x, y) {
         if (hasPiece) {
-            console.log("something");
-            props.movePiece([currentPiece[0],currentPiece[1]], [x,y]);
-            highlightedSquares = [];
-            doFlip(!flip);
-            hasPiece = false;
+            let isIn = false;
+            
+            for (let i = 0; i < highlightedSquares.length; i++) {
+                if (highlightedSquares[i][0] == x && highlightedSquares[i][1] == y) {
+                    isIn = true;
+                }
+
+            }
+            if (isIn) {
+                props.movePiece([currentPiece[0],currentPiece[1]], [x,y]);
+                highlightedSquares = [];
+                doFlip(!flip);
+                hasPiece = false;
+            }
         } else if (props.board[x][y] != 0) {
             doFlip(!flip);
             hasPiece = true;
