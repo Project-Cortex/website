@@ -29,7 +29,7 @@ export default function Board(props) {
     function clickPiece(x, y) {
         if (hasPiece) {
             let isIn = false;
-            
+            console.log(highlightedSquares);
             for (let i = 0; i < highlightedSquares.length; i++) {
                 if (highlightedSquares[i][0] == x && highlightedSquares[i][1] == y) {
                     isIn = true;
@@ -39,9 +39,9 @@ export default function Board(props) {
             if (isIn) {
                 props.movePiece([currentPiece[0],currentPiece[1]], [x,y]);
                 highlightedSquares = [];
-                doFlip(!flip);
                 hasPiece = false;
             }
+            doFlip(!flip);
         } else if (props.board[x][y] != 0) {
             doFlip(!flip);
             hasPiece = true;
@@ -54,11 +54,10 @@ export default function Board(props) {
 
     function findPotentialMoves (x, y) {
         let possibleMoves = game.getMove(x,y);
-        //console.log(possibleMoves);
         highlightedSquares = [];
         for (let i = 0; i < possibleMoves.length; i++) {
             for (let j = 0; j < possibleMoves[i].length; j++) {
-                if (possibleMoves[i][j] != 0) {
+                if (possibleMoves[i][j] !== 0) {
                     highlightedSquares.push([i, j])
                 }
             }
@@ -75,6 +74,7 @@ export default function Board(props) {
     let board = [];
     if (hasPiece) {
         findPotentialMoves(currentPiece[0], currentPiece[1]);
+        console.log("Finding potential moves");
         let length = highlightedSquares.length;
         for (let i = 0; i < highlightedSquares.length; i++) {
             if (props.board[highlightedSquares[i][0]][highlightedSquares[i][1]] != 0) {
