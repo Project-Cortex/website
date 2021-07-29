@@ -7,6 +7,9 @@ const bishop = [0, 0, 8];// 4
 const king = [1, 1, 1];// 15
 const queen = [8, 8, 8];// 9
 
+//determines which rooks and kings have moved. bottom rook = 0, 1; bottom king = 2, etc.
+const rookAndKingMoves = [0, 0, 0, 0, 0, 0]
+
 function getPiecefromPIdent(pIdent){
     pIdent = Math.abs(pIdent);
     if(pIdent === 1) return pawn;
@@ -25,8 +28,6 @@ function checkCheck(board, moveBoard, pIdent){
     let tempBoard = copyBoard(board);
 
     let movePositions = getAllPos(moveBoard, 1);
-
-    console.log(moveBoard);
 
     let current_pos = getAllPos(moveBoard, 3)[0];
 
@@ -119,13 +120,82 @@ function getPIdentAtPosition(board, pos){
     return board[pos[0]][pos[1]];
 }
 
+function checkCastle(board, moveBoard, side){
+
+    let kingPos  = getAllPos(board, 15 * side)[0];
+
+    let clearLeft = false;
+    let clearRight = false;
+
+    //1. is the way to the rooks clear
+    
+    //1a. check right
+    
+    if(board[kingPos[0]][kingPos[1] + 1] === 0 && board[kingPos[0]][kingPos[1] + 2] === 0 && board[kingPos[0]][kingPos[1] + 3] === 5){
+        clearRight = true;
+    }
+
+    //1b. check left
+
+    if(board[kingPos[0]][kingPos[1] - 1] === 0 && board[kingPos[0]][kingPos[1] - 2] === 0 && board[kingPos[0]][kingPos[1] - 3] === 0 && board[kingPos[0]][kingPos[1] - 4] === 5){
+        clearLeft = true;
+    }
+
+    //moveBoard[kingPos[0]][kingPos[1] + 2] = 1;
+    //moveBoard[kingPos[0]][kingPos[1] - 3] = 1;
+
+
+
+    return moveBoard;
+}
+
+function checkKingRookMoves(board){
+    let rookOne = board[0][0];
+    let rookTwo = board[0][7];
+    let kingOne = board[0][4];
+    let rookThree = board[7][0];
+    let rookFour = board[7][7];
+    let kingTwo = board[7][4];
+
+    //this is annoying
+    if(Math.abs(rookOne) !== 5){
+        rookAndKingMoves[0] = 1;
+    }
+
+    if(Math.abs(rookTwo) !== 5){
+        rookAndKingMoves[1] = 1;
+    }
+
+    if(Math.abs(kingOne) !== 15){
+        rookAndKingMoves[2] = 1;
+    }
+
+    if(Math.abs(rookThree) !== 5){
+        rookAndKingMoves[3] = 1;
+    }
+
+    if(Math.abs(rookFour) !== 5){
+        rookAndKingMoves[4] = 1;
+    }
+
+    if(Math.abs(kingTwo) !== 15){
+        rookAndKingMoves[5] = 1;
+    }
+}
+
 
 //pIdent = piece identity, board = current board = [8][8], pos = [y, x]
 export default function getValidMoveTiles(board, pos){
+
+    checkKingRookMoves(board);
     
     let moveBoard = getMoveTiles(board, pos);
 
     moveBoard = checkCheck(board, moveBoard, board[pos[0]][pos[1]]);
+
+    if(Math.abs(board[pos[0]][pos[1]]) == 15){
+        moveBoard = checkCastle(board, moveBoard, Math.sign(getPIdentAtPosition(board, pos)));
+    }
 
     return moveBoard;
 }
@@ -134,19 +204,18 @@ export default function getValidMoveTiles(board, pos){
 function getMoveTiles(board, pos){
     //all the good stuff here later
     
-    pos = [pos[0], pos[1]];
-    if(board[pos[0]][pos[1]] === 0) {
-        console.warn("ATTEMPTED TO GET VALID MOVE OF EMPTY SQUARE");
-        return -1;
-    }
-
-
     let pIdent = board[pos[0]][pos[1]];
     let moveBoard = [];
     for(let i = 0; i < 8; i++){
         moveBoard.push([0, 0, 0, 0, 0, 0, 0, 0]);
     }
-    
+
+    pos = [pos[0], pos[1]];
+    if(board[pos[0]][pos[1]] === 0) {
+        console.warn("ATTEMPTED TO GET VALID MOVE OF EMPTY SQUARE");
+        return moveBoard; //returns empty board
+    }
+
     moveBoard[pos[0]][pos[1]] = 3;
 
     let absP = Math.abs(pIdent);
