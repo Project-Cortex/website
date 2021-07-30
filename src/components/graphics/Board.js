@@ -41,15 +41,13 @@ export default function Board(props) {
                 highlightedSquares = [];
                 hasPiece = false;
             }
-            doFlip(!flip);
         } else if (props.board[x][y] != 0) {
-            doFlip(!flip);
             hasPiece = true;
         } else {
-            doFlip(!flip);
             hasPiece = false;
         }
         currentPiece = [x, y]
+        doFlip(!flip);
     }
 
     function findPotentialMoves (x, y) {
@@ -58,6 +56,7 @@ export default function Board(props) {
         for (let i = 0; i < possibleMoves.length; i++) {
             for (let j = 0; j < possibleMoves[i].length; j++) {
                 if (possibleMoves[i][j] !== 0) {
+                    console.log([i, j]);
                     highlightedSquares.push([i, j])
                 }
             }
@@ -74,13 +73,16 @@ export default function Board(props) {
     let board = [];
     if (hasPiece) {
         findPotentialMoves(currentPiece[0], currentPiece[1]);
-        console.log("Finding potential moves");
         let length = highlightedSquares.length;
+        console.log(props.board);
+        console.log(highlightedSquares);
         for (let i = 0; i < highlightedSquares.length; i++) {
-            if (props.board[highlightedSquares[i][0]][highlightedSquares[i][1]] != 0) {
+            console.log(highlightedSquares[i]);
+            if (highlightedSquares[i][0] === currentPiece[0] && highlightedSquares[i][1] === currentPiece[1]) {
                 highlightedSquares.splice(i, 1);
                 i--;
             }
+            console.log(highlightedSquares);
         }
     } 
 
