@@ -127,7 +127,11 @@ export default function Board(props) {
 
             for (let o = 0; o < highlightedSquares.length; o++) {
                 if (j === highlightedSquares[o][0] && i === highlightedSquares[o][1]) {
-                    color = "tile highlighted-tile";
+                    if (props.board[j][i] !== 0) {
+                        color = "tile captured-tile";
+                    } else {
+                        color = "tile highlighted-tile";
+                    }
                 }
             }
 
