@@ -8,7 +8,8 @@ const king = [1, 1, 1];// 15
 const queen = [8, 8, 8];// 9
 
 //determines which rooks and kings have moved. bottom rook = 0, 1; bottom king = 2, etc.
-const rookAndKingMoves = [0, 0, 0, 0, 0, 0]
+let rookAndKingMoves = [0, 0, 0, 0, 0, 0];
+let rookAndKingForm = [5, 5, 15, -5, -5, -15];
 
 function getPiecefromPIdent(pIdent){
     pIdent = Math.abs(pIdent);
@@ -122,6 +123,9 @@ function getPIdentAtPosition(board, pos){
 
 function checkCastle(board, moveBoard, side){
 
+    //update whether or not rooks and kings have moved
+    checkKingRookMoves(board);
+
     let kingPos  = getAllPos(board, 15 * side)[0];
 
     let clearLeft = false;
@@ -131,55 +135,70 @@ function checkCastle(board, moveBoard, side){
     
     //1a. check right
     
-    if(board[kingPos[0]][kingPos[1] + 1] === 0 && board[kingPos[0]][kingPos[1] + 2] === 0 && board[kingPos[0]][kingPos[1] + 3] === 5){
+    if(board[kingPos[0]][kingPos[1] + 1] === 0 && board[kingPos[0]][kingPos[1] + 2] === 0 && Math.abs(board[kingPos[0]][kingPos[1] + 3]) === 5){
         clearRight = true;
     }
 
     //1b. check left
 
-    if(board[kingPos[0]][kingPos[1] - 1] === 0 && board[kingPos[0]][kingPos[1] - 2] === 0 && board[kingPos[0]][kingPos[1] - 3] === 0 && board[kingPos[0]][kingPos[1] - 4] === 5){
+    if(board[kingPos[0]][kingPos[1] - 1] === 0 && board[kingPos[0]][kingPos[1] - 2] === 0 && board[kingPos[0]][kingPos[1] - 3] === 0 && Math.abs(board[kingPos[0]][kingPos[1] - 4]) === 5){
         clearLeft = true;
     }
 
     //moveBoard[kingPos[0]][kingPos[1] + 2] = 1;
     //moveBoard[kingPos[0]][kingPos[1] - 3] = 1;
 
+    //check whether each left and right is valid
 
+    let rookKingMoveArr = [];
+
+    if(kingPos[0] === 0){
+        rookKingMoveArr = [rookAndKingMoves[0], rookAndKingMoves[1], rookAndKingMoves[2]];
+    }else{
+        rookKingMoveArr = [rookAndKingMoves[3], rookAndKingMoves[4], rookAndKingMoves[5]];
+    }
+
+    //FINALLY
+
+    if(clearLeft && rookKingMoveArr[0] !== 1 && rookKingMoveArr[2] !== 1){
+        moveBoard[kingPos[0]][kingPos[1] - 3] = 1;
+    }
+
+    if(clearRight && rookKingMoveArr[1] !== 1 && rookKingMoveArr[2] !== 1){
+        moveBoard[kingPos[0]][kingPos[1] + 2] = 1;
+    }
 
     return moveBoard;
 }
 
 function checkKingRookMoves(board){
-    let rookOne = board[0][0];
-    let rookTwo = board[0][7];
-    let kingOne = board[0][4];
-    let rookThree = board[7][0];
-    let rookFour = board[7][7];
-    let kingTwo = board[7][4];
 
-    //this is annoying
-    if(Math.abs(rookOne) !== 5){
-        rookAndKingMoves[0] = 1;
+    if(rookAndKingMoves[0] !== 1) rookAndKingMoves[0] = board[0][0];
+    if(rookAndKingMoves[1] !== 1) rookAndKingMoves[1] = board[0][7];
+    if(rookAndKingMoves[2] !== 1) rookAndKingMoves[2] = board[0][4];
+    if(rookAndKingMoves[3] !== 1) rookAndKingMoves[3] = board[7][0];
+    if(rookAndKingMoves[4] !== 1) rookAndKingMoves[4] = board[7][7];
+    if(rookAndKingMoves[5] !== 1) rookAndKingMoves[5] = board[7][4];
+
+    //initialize rookAndKingMoves for formation
+    if(rookAndKingMoves[0] === 0){
+        //check for which side is starting on bottom/top
+        if(rookAndKingMoves[0] < 0){
+            for(let i = 0; i < 6; i++){
+                rookAndKingForm[i] *= -1;
+            }
+        }
     }
 
-    if(Math.abs(rookTwo) !== 5){
-        rookAndKingMoves[1] = 1;
-    }
+    
 
-    if(Math.abs(kingOne) !== 15){
-        rookAndKingMoves[2] = 1;
-    }
+    //check each individual piece from rookAndKingMoves against the rookAndKingForm to check for change
+    // -- first time that there is any discrepancy, rookAndKingMoves[i] = 1;
 
-    if(Math.abs(rookThree) !== 5){
-        rookAndKingMoves[3] = 1;
-    }
-
-    if(Math.abs(rookFour) !== 5){
-        rookAndKingMoves[4] = 1;
-    }
-
-    if(Math.abs(kingTwo) !== 15){
-        rookAndKingMoves[5] = 1;
+    for(let i = 0; i < 6; i++){
+        if(rookAndKingMoves[i] !== rookAndKingForm[i]){
+            rookAndKingMoves[i] = 1;
+        }
     }
 }
 
