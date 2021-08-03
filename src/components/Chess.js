@@ -2,6 +2,7 @@ import Board from "./graphics/Board.js";
 
 import "./Chess.css";
 import { useState } from "react";
+import Piece from "./graphics/Piece.js";
 
 let default_board = [];
 
@@ -22,9 +23,44 @@ function Chess() {
       changeGrid(temp);
     }
 
+    function changePiece(pos,  newValue) {
+      let temp = grid;
+      console.log(pos);
+      temp[pos[0]][pos[1]] = newValue;
+      changeGrid(temp);
+    }
+
+    function promotePiece(position, value, isWhite) {
+      if (value === "2") {
+        if (isWhite) {
+          changePiece(position, 5);
+        } else {
+          changePiece(position, -5);
+        }
+      } else if (value === "3") {
+        if (isWhite) {
+          changePiece(position, 4);
+        } else {
+          changePiece(position, -4);
+        }
+      } else if (value === "4") {
+        if (isWhite) {
+          changePiece(position, 3);
+        } else {
+          changePiece(position, -3);
+        }
+      } else {
+        if (isWhite) {
+          changePiece(position, 9);
+        } else {
+          changePiece(position, -9);
+        }
+      }
+    }
+
     return (
       <div className="center">
-          <Board  board={grid} invert={false} movePiece={movePiece}></Board>
+          <Board  board={grid} invert={false} movePiece={movePiece} promotePiece={promotePiece}></Board>
       </div>
     );
   }

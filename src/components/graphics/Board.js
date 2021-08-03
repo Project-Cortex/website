@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Game from "../Game/Game.js";
-
 import "./Board.css";
+
 
 import white_pawn from "../../assets/white_pawn.svg";
 import white_knight from "../../assets/white_knight.svg";
@@ -29,7 +29,6 @@ export default function Board(props) {
     function clickPiece(x, y) {
         if (hasPiece) {
             let isIn = false;
-            console.log(highlightedSquares);
             for (let i = 0; i < highlightedSquares.length; i++) {
                 if (highlightedSquares[i][0] == x && highlightedSquares[i][1] == y) {
                     isIn = true;
@@ -37,11 +36,12 @@ export default function Board(props) {
 
             }
             if (isIn) {
+                checkPromotion(currentPiece, [x,y]);
                 props.movePiece([currentPiece[0],currentPiece[1]], [x,y]);
                 highlightedSquares = [];
                 hasPiece = false;
             }
-        } else if (props.board[x][y] != 0) {
+        } else if (props.board[x][y] !== 0) {
             hasPiece = true;
         } else {
             hasPiece = false;
@@ -50,13 +50,19 @@ export default function Board(props) {
         doFlip(!flip);
     }
 
+    function checkPromotion(pieceLocation, newLocation) {
+        if (Math.abs(props.board[pieceLocation[0]][pieceLocation[1]] === 1 && (newLocation[0] === 0 || newLocation[0] === 7))) {
+            let input = prompt("Promotion 1 - Queen (default), 2 - Rook, 3 - Bishop, 4 - Knight ");
+            props.promotePiece([[pieceLocation[0]], pieceLocation[1]], input, !props.invert);
+        }
+    }
+
     function findPotentialMoves (x, y) {
         let possibleMoves = game.getMove(x,y);
         highlightedSquares = [];
         for (let i = 0; i < possibleMoves.length; i++) {
             for (let j = 0; j < possibleMoves[i].length; j++) {
                 if (possibleMoves[i][j] !== 0) {
-                    console.log([i, j]);
                     highlightedSquares.push([i, j])
                 }
             }
@@ -74,15 +80,11 @@ export default function Board(props) {
     if (hasPiece) {
         findPotentialMoves(currentPiece[0], currentPiece[1]);
         let length = highlightedSquares.length;
-        console.log(props.board);
-        console.log(highlightedSquares);
         for (let i = 0; i < highlightedSquares.length; i++) {
-            console.log(highlightedSquares[i]);
             if (highlightedSquares[i][0] === currentPiece[0] && highlightedSquares[i][1] === currentPiece[1]) {
                 highlightedSquares.splice(i, 1);
                 i--;
             }
-            console.log(highlightedSquares);
         }
     } 
 
@@ -162,8 +164,10 @@ export default function Board(props) {
           board = newBoard;
       }
     return (
-    <div id="Board">
-        {board}
-    </div>
+
+        <div id="Board">
+            {board}
+        </div>
+ 
     );
 }
